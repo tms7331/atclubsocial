@@ -1,26 +1,63 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground-rgb: 226, 232, 240;
+  --background-start-rgb: 17, 24, 39;
+  --background-end-rgb: 17, 24, 39;
+  --accent-color: 74, 222, 128;
+  --secondary-accent: 37, 99, 235;
+  /* Changed from purple to blue-600 */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+}
+
+.font-pixel {
+  font-family: var(--font-press-start-2p);
+  text-shadow: 2px 2px 0 #000;
+  letter-spacing: -1px;
+}
+
+.font-mono {
+  font-family: var(--font-vt323);
+}
+
+.font-body {
+  font-family: var(--font-space-grotesk);
+}
+
+.font-readable {
+  font-family: var(--font-inter);
+}
+
+/* Pixelated border effect */
+.pixelated-border {
+  box-shadow: 0 0 0 2px #4ade80, 0 0 0 4px #000, 0 0 0 6px #4ade80;
+}
+
+/* Navbar specific styles */
+.navbar-text {
+  color: rgb(74, 222, 128);
+}
+
+.content-card {
+  background-color: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.content-card-alt {
+  background-color: rgba(31, 41, 55, 0.5);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  /* Changed from purple to blue */
+}
+
+.accent-text {
+  color: rgb(74, 222, 128);
+}
+
+.secondary-accent-text {
+  color: rgb(37, 99, 235);
+  /* Changed from purple to blue */
 }
