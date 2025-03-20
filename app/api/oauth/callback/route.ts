@@ -36,6 +36,7 @@ export async function GET(request: Request) {
                 }
                 // If restore fails, continue with new session
             } catch (err) {
+                console.warn('Failed to restore existing session:', err);
                 // Clear the invalid session
                 await clientSession.destroy();
             }
@@ -47,6 +48,7 @@ export async function GET(request: Request) {
         // Redirect to home page on success
         return Response.redirect(new URL('/', request.url));
     } catch (error) {
+        console.error('Error in callback endpoint:', error);
         // Redirect to home page with error on failure
         return Response.redirect(new URL('/?error', request.url));
     }

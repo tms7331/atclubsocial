@@ -14,6 +14,7 @@ export async function POST(request: Request) {
 
         return Response.json({ url: url.toString() });
     } catch (error) {
+        console.error('Error in login endpoint:', error);
         return Response.json(
             { error: 'Failed to generate authorization URL' },
             { status: 500 }

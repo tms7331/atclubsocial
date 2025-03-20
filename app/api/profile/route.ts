@@ -35,11 +35,13 @@ export async function GET() {
 
             return Response.json({ profile: profile.data });
         } catch (err) {
+            console.error('Error getting profile:', err);
             // Clear invalid session
             // await session.destroy();
             return Response.json({ profile: null });
         }
     } catch (error) {
+        console.error('Error getting profile:', error);
         return Response.json({ error: 'Failed to get profile' }, { status: 500 });
     }
 } 
