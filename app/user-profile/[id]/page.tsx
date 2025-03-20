@@ -1,3 +1,6 @@
+'use client'
+import * as React from 'react'
+
 const users = [
   {
     id: 1,
@@ -46,8 +49,9 @@ const users = [
   },
 ]
 
-export default function UserProfilePage({ params }: { params: { id: string } }) {
-  const userId = Number.parseInt(params.id)
+export default function UserProfilePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params)
+  const userId = Number.parseInt(id)
   const user = users.find((u) => u.id === userId) || users[0]
 
   return (

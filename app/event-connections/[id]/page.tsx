@@ -1,3 +1,6 @@
+'use client'
+import * as React from 'react'
+
 import Link from "next/link"
 
 // Mock data for demonstration
@@ -62,8 +65,10 @@ const users = [
   },
 ]
 
-export default function EventConnectionsPage({ params }: { params: { id: string } }) {
-  const eventId = Number.parseInt(params.id)
+function EventConnectionsPage({ params }: { params: Promise<{ id: string }> }) {
+  // Use React.use() to unwrap the Promise in client components
+  const { id } = React.use(params)
+  const eventId = Number.parseInt(id)
   const event = events.find((e) => e.id === eventId) || events[0]
 
   // Determine theme colors based on event theme
@@ -121,4 +126,7 @@ export default function EventConnectionsPage({ params }: { params: { id: string 
     </div>
   )
 }
+
+// Add default export
+export default EventConnectionsPage
 
