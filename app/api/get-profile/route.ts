@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     try {
         // Get the DID from the URL search params
         const { searchParams } = new URL(request.url)
-        const did = searchParams.get('did')
+        let did = searchParams.get('did')
 
         // Validate required field
         if (!did) {
@@ -30,6 +30,10 @@ export async function GET(request: Request) {
         if (error) throw error
 
         const agent = new Agent(publicClient);
+        // Return our own profile if the did is fake...
+        if (did.startsWith('fake')) {
+            did = 'did:plc:z6tnolviceuaiiw66ossq3dj';
+        }
         const profile = await agent.getProfile({ actor: did });
 
         return NextResponse.json({

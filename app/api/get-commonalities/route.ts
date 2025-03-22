@@ -22,8 +22,7 @@ export async function GET(request: Request) {
             .select(`
                 did0,
                 did1,
-                commonalities,
-                users:atclub_users!inner(bio, github, linkedin, spotify, youtube, podcasts, location)
+                commonalities
             `)
             .eq('did0', did0)
             .order('created_at', { ascending: false })

@@ -143,14 +143,14 @@ export default function BlueskyConnectPage() {
             <div className="text-center text-slate-300">Loading connections...</div>
           ) : connections.map((connection) => (
             <Link
-              key={connection.id}
+              key={connection.did1}
               href={`/user-profile/${connection.did1}`}
               className="block p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors border border-gray-600/50"
             >
               <div className="flex items-start">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-blue-600 mr-4 flex-shrink-0"></div>
                 <div className="flex-1">
-                  <h4 className="font-pixel text-sm text-slate-200 mb-1">{connection.did1}</h4>
+                  <h4 className="font-pixel text-sm text-slate-200 mb-1">{connection.did1.slice(0, 14)}</h4>
                   <div>
                     <span className="font-body text-xs text-slate-400 block mb-1">Common Interests:</span>
                     <p className="font-body text-sm text-slate-300">{connection.commonalities}</p>

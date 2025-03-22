@@ -50,7 +50,7 @@ export default function HomePage() {
           setDid(data.profile.did)
           fetch("/api/compute-commonalities", {
             method: "POST",
-            body: JSON.stringify({ did: data.profile.did }),
+            body: JSON.stringify({ did0: data.profile.did }),
             headers: {
               "Content-Type": "application/json",
             },
