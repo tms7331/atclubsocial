@@ -4,11 +4,14 @@ import { useState, useEffect } from "react"
 import BlinkingCursor from "./components/BlinkingCursor"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
+import { useAtom } from 'jotai'
+import { didAtom } from './atoms/profile'
 
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [username, setUsername] = useState("")
   const [blueskyHandle, setBlueskyHandle] = useState("")
+  const [, setDid] = useAtom(didAtom)
 
   const handleLoginBsky = async () => {
     const handle = 'thomasr8.bsky.social';
@@ -32,22 +35,32 @@ export default function HomePage() {
     }
   }
 
-  const loadProfile = async () => {
-    try {
-      const response = await fetch('/api/profile');
-      const data = await response.json();
-      console.log("Checking profile", data);
-      if (data.profile) {
-        console.log('Profile loaded!!', data.profile);
-        setIsLoggedIn(true)
-        setUsername(data.profile.displayName)
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    }
-  };
 
   useEffect(() => {
+
+    const loadProfile = async () => {
+      try {
+        const response = await fetch('/api/profile');
+        const data = await response.json();
+        console.log("Checking profile", data);
+        if (data.profile) {
+          console.log('Profile loaded!!', data.profile);
+          setIsLoggedIn(true)
+          setUsername(data.profile.displayName)
+          setDid(data.profile.did)
+          fetch("/api/compute-commonalities", {
+            method: "POST",
+            body: JSON.stringify({ did: data.profile.did }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    };
+
     loadProfile();
   }, []);
 

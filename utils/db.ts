@@ -33,3 +33,26 @@ export const createDb = (supabaseUrl: string, supabaseKey: string): SupabaseClie
 }
 
 export type Database = SupabaseClient
+
+export interface AtclubCommonality {
+    id: number
+    did0: string
+    did1: string
+    commonalities: string
+    created_at: string
+    updated_at: string
+}
+
+export interface AtclubUser {
+    id: number
+    did: string
+    bio: string | null
+    github: string | null
+    linkedin: string | null
+    spotify: string | null
+    youtube: string | null
+    podcasts: string | null
+    location: string | null
+    created_at: string
+    updated_at: string
+}

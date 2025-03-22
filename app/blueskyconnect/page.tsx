@@ -1,45 +1,38 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-
-// Mock users data - reused from event-connections
-const users = [
-  {
-    id: 1,
-    name: "Alex Johnson",
-    interests: ["Technology", "Music", "Photography"],
-    commonInterests: "You both share interests in Technology and Music.",
-  },
-  {
-    id: 2,
-    name: "Sam Rivera",
-    interests: ["Art", "Gaming", "Travel"],
-    commonInterests: "You both enjoy Art and have mentioned Travel recently.",
-  },
-  {
-    id: 3,
-    name: "Jordan Lee",
-    interests: ["Technology", "Books", "Cooking"],
-    commonInterests: "You both are interested in Technology and Books.",
-  },
-  {
-    id: 4,
-    name: "Taylor Kim",
-    interests: ["Music", "Fitness", "Film"],
-    commonInterests: "You both have Music and Film as common interests.",
-  },
-  {
-    id: 5,
-    name: "Morgan Chen",
-    interests: ["Photography", "Travel", "Food"],
-    commonInterests: "You both enjoy Photography and have talked about Food.",
-  },
-]
+import { AtclubCommonality } from "@/utils/db"
+import { useAtom } from 'jotai'
+import { didAtom } from '../atoms/profile'
 
 export default function BlueskyConnectPage() {
   const [connectOption, setConnectOption] = useState<string>("professional")
   const [localOnly, setLocalOnly] = useState<boolean>(false)
+  const [connections, setConnections] = useState<AtclubCommonality[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [did] = useAtom(didAtom)
+
+  useEffect(() => {
+    const fetchCommonalities = async () => {
+      if (!did) return;
+
+      try {
+        const response = await fetch(`/api/get-commonalities?did0=${did}`)
+        const data = await response.json()
+
+        if (data.success) {
+          setConnections(data.commonalities)
+        }
+      } catch (error) {
+        console.error("Failed to fetch connections:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCommonalities()
+  }, [did])
 
   return (
     <div className="space-y-6">
@@ -56,18 +49,16 @@ export default function BlueskyConnectPage() {
           <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0">
             {/* Option 1: Professional Connect */}
             <div
-              className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
-                connectOption === "professional"
-                  ? "border-green-500 bg-green-500/10"
-                  : "border-gray-600 bg-gray-700/30 hover:border-gray-500"
-              }`}
+              className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-colors ${connectOption === "professional"
+                ? "border-green-500 bg-green-500/10"
+                : "border-gray-600 bg-gray-700/30 hover:border-gray-500"
+                }`}
               onClick={() => setConnectOption("professional")}
             >
               <div className="flex items-center mb-2">
                 <div
-                  className={`w-4 h-4 rounded-full border-2 mr-2 flex items-center justify-center ${
-                    connectOption === "professional" ? "border-green-500" : "border-gray-500"
-                  }`}
+                  className={`w-4 h-4 rounded-full border-2 mr-2 flex items-center justify-center ${connectOption === "professional" ? "border-green-500" : "border-gray-500"
+                    }`}
                 >
                   {connectOption === "professional" && <div className="w-2 h-2 rounded-full bg-green-500"></div>}
                 </div>
@@ -80,18 +71,16 @@ export default function BlueskyConnectPage() {
 
             {/* Option 2: Culture Connect */}
             <div
-              className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
-                connectOption === "culture"
-                  ? "border-blue-500 bg-blue-500/10"
-                  : "border-gray-600 bg-gray-700/30 hover:border-gray-500"
-              }`}
+              className={`flex-1 p-4 rounded-lg border-2 cursor-pointer transition-colors ${connectOption === "culture"
+                ? "border-blue-500 bg-blue-500/10"
+                : "border-gray-600 bg-gray-700/30 hover:border-gray-500"
+                }`}
               onClick={() => setConnectOption("culture")}
             >
               <div className="flex items-center mb-2">
                 <div
-                  className={`w-4 h-4 rounded-full border-2 mr-2 flex items-center justify-center ${
-                    connectOption === "culture" ? "border-blue-500" : "border-gray-500"
-                  }`}
+                  className={`w-4 h-4 rounded-full border-2 mr-2 flex items-center justify-center ${connectOption === "culture" ? "border-blue-500" : "border-gray-500"
+                    }`}
                 >
                   {connectOption === "culture" && <div className="w-2 h-2 rounded-full bg-blue-500"></div>}
                 </div>
@@ -106,9 +95,8 @@ export default function BlueskyConnectPage() {
           {/* Local Option */}
           <div className="flex items-center">
             <div
-              className={`w-5 h-5 rounded border-2 mr-2 cursor-pointer flex items-center justify-center ${
-                localOnly ? "border-green-500 bg-green-500/20" : "border-gray-500"
-              }`}
+              className={`w-5 h-5 rounded border-2 mr-2 cursor-pointer flex items-center justify-center ${localOnly ? "border-green-500 bg-green-500/20" : "border-gray-500"
+                }`}
               onClick={() => setLocalOnly(!localOnly)}
             >
               {localOnly && (
@@ -135,9 +123,8 @@ export default function BlueskyConnectPage() {
         {/* Search Button */}
         <div className="flex justify-center">
           <button
-            className={`px-6 py-2 ${
-              connectOption === "professional" ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"
-            } text-white rounded font-pixel text-sm transition-colors`}
+            className={`px-6 py-2 ${connectOption === "professional" ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"
+              } text-white rounded font-pixel text-sm transition-colors`}
           >
             Find Connections
           </button>
@@ -152,19 +139,21 @@ export default function BlueskyConnectPage() {
         </h3>
 
         <div className="space-y-4">
-          {users.map((user) => (
+          {loading ? (
+            <div className="text-center text-slate-300">Loading connections...</div>
+          ) : connections.map((connection) => (
             <Link
-              key={user.id}
-              href={`/user-profile/${user.id}`}
+              key={connection.id}
+              href={`/user-profile/${connection.did1}`}
               className="block p-4 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors border border-gray-600/50"
             >
               <div className="flex items-start">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-blue-600 mr-4 flex-shrink-0"></div>
                 <div className="flex-1">
-                  <h4 className="font-pixel text-sm text-slate-200 mb-1">{user.name}</h4>
+                  <h4 className="font-pixel text-sm text-slate-200 mb-1">{connection.did1}</h4>
                   <div>
                     <span className="font-body text-xs text-slate-400 block mb-1">Common Interests:</span>
-                    <p className="font-body text-sm text-slate-300">{user.commonInterests}</p>
+                    <p className="font-body text-sm text-slate-300">{connection.commonalities}</p>
                   </div>
                 </div>
               </div>
