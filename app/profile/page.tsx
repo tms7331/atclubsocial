@@ -18,20 +18,19 @@ interface GithubData {
 }
 
 interface LinkedinData {
-  name: string;
   bio: string;
 }
 
 interface YoutubeData {
-  channelsFollowed: string[];
+  channelsFollowed: string;
 }
 
 interface SpotifyData {
-  topArtists: string[];
+  topArtists: string;
 }
 
 interface PodcastData {
-  favoritePodcasts: string[];
+  favoritePodcasts: string;
 }
 
 interface LocationData {
@@ -66,12 +65,11 @@ export default function ProfilePage() {
   const [did] = useAtom(didAtom)
   const [profileData, setProfileData] = useAtom(profileDataAtom)
 
-  // Update the dataSourceStatus object with proper typing
   const dataSourceStatus: DataSourceStatuses = {
-    Github: { imported: true, data: { username: "devuser", commits: 120, stars: 45 } },
-    Linkedin: { imported: true, data: { name: "Dev User", bio: "Software Engineer passionate about web development" } },
+    Github: { imported: false, data: null },
+    Linkedin: { imported: false, data: null },
     Spotify: { imported: false, data: null },
-    Youtube: { imported: true, data: { channelsFollowed: ["Code with Me", "Tech Talks", "Web Dev Simplified"] } },
+    Youtube: { imported: false, data: null },
     Podcasts: { imported: false, data: null },
     Location: { imported: false, data: null },
   }
@@ -110,34 +108,34 @@ export default function ProfilePage() {
           avatar: atprofile.avatar,
           sources: {
             Github: {
-              imported: !!data.github,
-              data: deserializeSourceData('Github', data.github)
+              imported: !!dbdata.github,
+              data: dbdata.github ? JSON.parse(dbdata.github) : null
             },
             Linkedin: {
-              imported: !!data.linkedin,
-              data: deserializeSourceData('Linkedin', data.linkedin)
+              imported: !!dbdata.linkedin,
+              data: dbdata.linkedin ? JSON.parse(dbdata.linkedin) : null
             },
             Spotify: {
-              imported: !!data.spotify,
-              data: deserializeSourceData('Spotify', data.spotify)
+              imported: !!dbdata.spotify,
+              data: dbdata.spotify ? JSON.parse(dbdata.spotify) : null
             },
             Youtube: {
-              imported: !!data.youtube,
-              data: deserializeSourceData('Youtube', data.youtube)
+              imported: !!dbdata.youtube,
+              data: dbdata.youtube ? JSON.parse(dbdata.youtube) : null
             },
             Podcasts: {
-              imported: !!data.podcasts,
-              data: deserializeSourceData('Podcasts', data.podcasts)
+              imported: !!dbdata.podcasts,
+              data: dbdata.podcasts ? JSON.parse(dbdata.podcasts) : null
             },
             Location: {
-              imported: !!data.location,
-              data: deserializeSourceData('Location', data.location)
+              imported: !!dbdata.location,
+              data: dbdata.location ? JSON.parse(dbdata.location) : null
             }
           }
         }
 
         setProfileData(transformedData)
-        setBio(data.bio || "Tell others about yourself, your interests, and what you're looking for on ATClubSocial.")
+        setBio(dbdata.bio || "Tell others about yourself, your interests, and what you're looking for on ATClubSocial.")
       } catch (error) {
         console.error('Error fetching profile data:', error)
       }
@@ -232,13 +230,13 @@ export default function ProfilePage() {
       case "Github":
         return { username: "", commits: 0, stars: 0 };
       case "Linkedin":
-        return { name: "", bio: "" };
+        return { bio: "" };
       case "Youtube":
-        return { channelsFollowed: [] };
+        return { channelsFollowed: "" };
       case "Spotify":
-        return { topArtists: [] };
+        return { topArtists: "" };
       case "Podcasts":
-        return { favoritePodcasts: [] };
+        return { favoritePodcasts: "" };
       case "Location":
         return { city: "" };
     }
@@ -250,8 +248,9 @@ export default function ProfilePage() {
       return;
     }
 
-    const initialData = dataSourceStatus[source].imported
-      ? { ...dataSourceStatus[source].data }
+    // Use profileData instead of dataSourceStatus to get current values
+    const initialData = profileData?.sources[source].imported
+      ? { ...profileData.sources[source].data }
       : getInitialDataForSource(source);
 
     setManualEditData(initialData);
@@ -605,29 +604,10 @@ export default function ProfilePage() {
                           {source === "Linkedin" && (
                             <>
                               <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1">Name</label>
-                                <Input
-                                  value={manualEditData.name || ""}
-                                  onChange={(e) => handleManualDataChange("name", e.target.value)}
-                                  className="bg-gray-800 border-gray-600 text-slate-200 font-body"
-                                />
-                              </div>
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1">Position</label>
-                                <Input
-                                  value={manualEditData.position || ""}
-                                  onChange={(e) => handleManualDataChange("position", e.target.value)}
-                                  className="bg-gray-800 border-gray-600 text-slate-200 font-body"
-                                />
-                              </div>
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1">Connections</label>
-                                <Input
-                                  type="number"
-                                  value={manualEditData.connections || 0}
-                                  onChange={(e) =>
-                                    handleManualDataChange("connections", Number.parseInt(e.target.value))
-                                  }
+                                <label className="font-body text-slate-400 text-sm block mb-1">Bio</label>
+                                <Textarea
+                                  value={manualEditData.bio || ""}
+                                  onChange={(e) => handleManualDataChange("bio", e.target.value)}
                                   className="bg-gray-800 border-gray-600 text-slate-200 font-body"
                                 />
                               </div>
@@ -635,150 +615,51 @@ export default function ProfilePage() {
                           )}
 
                           {source === "Youtube" && (
-                            <>
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1">Channels Followed</label>
-                                {manualEditData.channelsFollowed &&
-                                  manualEditData.channelsFollowed.map((channel: string, index: number) => (
-                                    <div key={index} className="flex items-center mb-2">
-                                      <Input
-                                        value={channel}
-                                        onChange={(e) =>
-                                          handleManualArrayChange("channelsFollowed", index, e.target.value)
-                                        }
-                                        className="bg-gray-800 border-gray-600 text-slate-200 font-body"
-                                      />
-                                    </div>
-                                  ))}
-                              </div>
-                            </>
+                            <div>
+                              <label className="font-body text-slate-400 text-sm block mb-1">Channels Followed</label>
+                              <Input
+                                value={manualEditData.channelsFollowed || ""}
+                                onChange={(e) => handleManualDataChange("channelsFollowed", e.target.value)}
+                                className="bg-gray-800 border-gray-600 text-slate-200 font-body"
+                                placeholder="Comma-separated list of channels"
+                              />
+                            </div>
                           )}
 
                           {source === "Spotify" && (
-                            <>
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1">Favorite Artists</label>
-                                {manualEditData.favoriteArtists &&
-                                  manualEditData.favoriteArtists.map((artist: string, index: number) => (
-                                    <div key={index} className="flex items-center mb-2">
-                                      <Input
-                                        value={artist}
-                                        onChange={(e) =>
-                                          handleManualArrayChange("favoriteArtists", index, e.target.value)
-                                        }
-                                        className="bg-gray-800 border-gray-600 text-slate-200 font-body"
-                                        placeholder="Artist name"
-                                      />
-                                    </div>
-                                  ))}
-                              </div>
-
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1 mt-3">Playlists</label>
-                                {manualEditData.playlists &&
-                                  manualEditData.playlists.map((playlist: string, index: number) => (
-                                    <div key={index} className="flex items-center mb-2">
-                                      <Input
-                                        value={playlist}
-                                        onChange={(e) => handleManualArrayChange("playlists", index, e.target.value)}
-                                        className="bg-gray-800 border-gray-600 text-slate-200 font-body"
-                                        placeholder="Playlist name"
-                                      />
-                                    </div>
-                                  ))}
-                              </div>
-
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1 mt-3">
-                                  Recently Played
-                                </label>
-                                {manualEditData.recentlyPlayed &&
-                                  manualEditData.recentlyPlayed.map((track: string, index: number) => (
-                                    <div key={index} className="flex items-center mb-2">
-                                      <Input
-                                        value={track}
-                                        onChange={(e) =>
-                                          handleManualArrayChange("recentlyPlayed", index, e.target.value)
-                                        }
-                                        className="bg-gray-800 border-gray-600 text-slate-200 font-body"
-                                        placeholder="Track name"
-                                      />
-                                    </div>
-                                  ))}
-                              </div>
-                            </>
+                            <div>
+                              <label className="font-body text-slate-400 text-sm block mb-1">Top Artists</label>
+                              <Input
+                                value={manualEditData.topArtists || ""}
+                                onChange={(e) => handleManualDataChange("topArtists", e.target.value)}
+                                className="bg-gray-800 border-gray-600 text-slate-200 font-body"
+                                placeholder="Comma-separated list of artists"
+                              />
+                            </div>
                           )}
 
                           {source === "Podcasts" && (
-                            <>
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1">Favorite Podcasts</label>
-                                {manualEditData.favoritePodcasts &&
-                                  manualEditData.favoritePodcasts.map((podcast: string, index: number) => (
-                                    <div key={index} className="flex items-center mb-2">
-                                      <Input
-                                        value={podcast}
-                                        onChange={(e) =>
-                                          handleManualArrayChange("favoritePodcasts", index, e.target.value)
-                                        }
-                                        className="bg-gray-800 border-gray-600 text-slate-200 font-body"
-                                        placeholder="Podcast name"
-                                      />
-                                    </div>
-                                  ))}
-                              </div>
-
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1 mt-3">
-                                  Favorite Episodes
-                                </label>
-                                {manualEditData.favoriteEpisodes &&
-                                  manualEditData.favoriteEpisodes.map((episode: string, index: number) => (
-                                    <div key={index} className="flex items-center mb-2">
-                                      <Input
-                                        value={episode}
-                                        onChange={(e) =>
-                                          handleManualArrayChange("favoriteEpisodes", index, e.target.value)
-                                        }
-                                        className="bg-gray-800 border-gray-600 text-slate-200 font-body"
-                                        placeholder="Episode name"
-                                      />
-                                    </div>
-                                  ))}
-                              </div>
-                            </>
+                            <div>
+                              <label className="font-body text-slate-400 text-sm block mb-1">Favorite Podcasts</label>
+                              <Input
+                                value={manualEditData.favoritePodcasts || ""}
+                                onChange={(e) => handleManualDataChange("favoritePodcasts", e.target.value)}
+                                className="bg-gray-800 border-gray-600 text-slate-200 font-body"
+                                placeholder="Comma-separated list of podcasts"
+                              />
+                            </div>
                           )}
 
                           {source === "Location" && (
-                            <>
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1">City</label>
-                                <Input
-                                  value={manualEditData.city || ""}
-                                  onChange={(e) => handleManualDataChange("city", e.target.value)}
-                                  className="bg-gray-800 border-gray-600 text-slate-200 font-body mb-3"
-                                  placeholder="Your city"
-                                />
-                              </div>
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1">Country</label>
-                                <Input
-                                  value={manualEditData.country || ""}
-                                  onChange={(e) => handleManualDataChange("country", e.target.value)}
-                                  className="bg-gray-800 border-gray-600 text-slate-200 font-body mb-3"
-                                  placeholder="Your country"
-                                />
-                              </div>
-                              <div>
-                                <label className="font-body text-slate-400 text-sm block mb-1">Timezone</label>
-                                <Input
-                                  value={manualEditData.timezone || ""}
-                                  onChange={(e) => handleManualDataChange("timezone", e.target.value)}
-                                  className="bg-gray-800 border-gray-600 text-slate-200 font-body"
-                                  placeholder="Your timezone (e.g., GMT-5, PST)"
-                                />
-                              </div>
-                            </>
+                            <div>
+                              <label className="font-body text-slate-400 text-sm block mb-1">City</label>
+                              <Input
+                                value={manualEditData.city || ""}
+                                onChange={(e) => handleManualDataChange("city", e.target.value)}
+                                className="bg-gray-800 border-gray-600 text-slate-200 font-body"
+                                placeholder="Your city"
+                              />
+                            </div>
                           )}
 
                           <div className="flex justify-end mt-4">
@@ -834,7 +715,6 @@ function DataPreview({ source, data }: DataPreviewProps) {
       const linkedinData = data as LinkedinData
       return (
         <div className="space-y-1">
-          <p className="font-body text-slate-300 text-sm">Name: {linkedinData.name}</p>
           <p className="font-body text-slate-300 text-sm">Bio: {linkedinData.bio}</p>
         </div>
       )
@@ -843,13 +723,7 @@ function DataPreview({ source, data }: DataPreviewProps) {
       return (
         <div className="space-y-1">
           <p className="font-body text-slate-300 text-sm">Channels followed:</p>
-          <ul className="list-disc list-inside">
-            {youtubeData.channelsFollowed.map((channel: string) => (
-              <li key={channel} className="font-body text-slate-300 text-sm ml-2">
-                {channel}
-              </li>
-            ))}
-          </ul>
+          <p className="font-body text-slate-300 text-sm">{youtubeData.channelsFollowed}</p>
         </div>
       )
     case "Spotify":
@@ -857,13 +731,7 @@ function DataPreview({ source, data }: DataPreviewProps) {
       return (
         <div className="space-y-1">
           <p className="font-body text-slate-300 text-sm">Top Artists:</p>
-          <ul className="list-disc list-inside">
-            {spotifyData.topArtists.map((artist: string) => (
-              <li key={artist} className="font-body text-slate-300 text-sm ml-2">
-                {artist}
-              </li>
-            ))}
-          </ul>
+          <p className="font-body text-slate-300 text-sm">{spotifyData.topArtists}</p>
         </div>
       )
     case "Podcasts":
@@ -871,13 +739,7 @@ function DataPreview({ source, data }: DataPreviewProps) {
       return (
         <div className="space-y-1">
           <p className="font-body text-slate-300 text-sm">Favorite Podcasts:</p>
-          <ul className="list-disc list-inside">
-            {podcastData.favoritePodcasts.map((podcast: string) => (
-              <li key={podcast} className="font-body text-slate-300 text-sm ml-2">
-                {podcast}
-              </li>
-            ))}
-          </ul>
+          <p className="font-body text-slate-300 text-sm">{podcastData.favoritePodcasts}</p>
         </div>
       )
     case "Location":
@@ -910,7 +772,6 @@ const serializeSourceData = (source: string, data: any): string => {
     case "Linkedin":
       const linkedinData = data as LinkedinData
       if (
-        typeof linkedinData.name === 'string' &&
         typeof linkedinData.bio === 'string'
       ) {
         return JSON.stringify(linkedinData)
