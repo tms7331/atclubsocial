@@ -9,57 +9,18 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useAtom } from 'jotai'
 import { didAtom, profileDataAtom } from '../atoms/profile'
-
-// Define interfaces for each data source type
-interface GithubData {
-  username: string;
-  commits: number,
-  stars: number;
-}
-
-interface LinkedinData {
-  bio: string;
-}
-
-interface YoutubeData {
-  channelsFollowed: string;
-}
-
-interface SpotifyData {
-  topArtists: string;
-}
-
-interface PodcastData {
-  favoritePodcasts: string;
-}
-
-interface LocationData {
-  city: string;
-}
-
-// Union type for all possible data types
-type SourceData = GithubData | LinkedinData | YoutubeData | SpotifyData | PodcastData | LocationData;
-
-// Interface for the status of each data source
-interface DataSourceStatus {
-  imported: boolean;
-  data: SourceData | null;
-}
-
-// Type for the entire data source status object
-interface DataSourceStatuses {
-  Github: DataSourceStatus;
-  Linkedin: DataSourceStatus;
-  Spotify: DataSourceStatus;
-  Youtube: DataSourceStatus;
-  Podcasts: DataSourceStatus;
-  Location: DataSourceStatus;
-}
-
-interface ProfileData {
-  sources: DataSourceStatuses;
-  bio?: string;
-}
+import {
+  ProfileData,
+  DataSourceStatuses,
+  DataSourceStatus,
+  SourceData,
+  GithubData,
+  LinkedinData,
+  YoutubeData,
+  SpotifyData,
+  PodcastData,
+  LocationData
+} from '@/app/types/profile'
 
 export default function ProfilePage() {
   const [did] = useAtom(didAtom)
